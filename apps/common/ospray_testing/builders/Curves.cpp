@@ -33,6 +33,7 @@ static std::vector<vec4f> points = {{-1.0f, 0.0f, -2.f, 0.2f},
     {-1.0f, 0.0f, -2.f, 0.2f},
     {0.0f, -1.0f, 0.0f, 0.2f},
     {1.0f, 0.0f, 2.f, 0.2f}};
+
 static std::vector<unsigned int> indices = {0, 1, 2, 3, 4, 5};
 
 void Curves::commit()
@@ -66,9 +67,15 @@ cpp::Group Curves::buildGroup() const
     geom.setParam("basis", OSP_CATMULL_ROM);
     geom.setParam("vertex.position_radius", cpp::Data(points));
   } else if (curveBasis == "linear") {
-    geom.setParam("radius", 0.1f);
-    geom.setParam("vertex.position",
-        cpp::Data(points.size(), sizeof(vec4f), (vec3f *)points.data()));
+    indices = {1, 2, 3, 4, 5, 6};
+    std::vector<char> flagsLinear = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+    geom.setParam("type", OSP_ROUND);
+    geom.setParam("basis", OSP_LINEAR);
+    geom.setParam("vertex.position_radius", cpp::Data(points));
+    geom.setParam("flags.linear", cpp::Data(flagsLinear));
+    // geom.setParam("radius", 0.1f);
+    // geom.setParam("vertex.position",
+    //     cpp::Data(points.size(), sizeof(vec4f), (vec3f *)points.data()));
   } else {
     geom.setParam("type", OSP_ROUND);
     geom.setParam("basis", OSP_BSPLINE);

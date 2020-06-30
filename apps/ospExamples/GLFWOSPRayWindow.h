@@ -82,9 +82,9 @@ class GLFWOSPRayWindow
   vec3f sunDirection{-0.25f, -1.0f, 0.0f};
   float turbidity{3.f};
 
-  std::string scene{"boxes"};
+  std::string scene{"curves"};
 
-  std::string curveBasis{"bspline"};
+  std::string curveBasis{"linear"};
 
   OSPRayRendererType rendererType{OSPRayRendererType::SCIVIS};
   std::string rendererTypeStr{"scivis"};

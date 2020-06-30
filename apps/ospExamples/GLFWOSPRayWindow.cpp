@@ -411,7 +411,7 @@ void GLFWOSPRayWindow::buildUI()
   ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
   ImGui::Begin("press 'g' to hide/show UI", nullptr, flags);
 
-  static int whichScene = 0;
+  static int whichScene = 2;
   if (ImGui::Combo("scene##whichScene",
           &whichScene,
           sceneUI_callback,
@@ -422,7 +422,7 @@ void GLFWOSPRayWindow::buildUI()
   }
 
   if (scene == "curves") {
-    static int whichCurveBasis = 0;
+    static int whichCurveBasis = 3;
     if (ImGui::Combo("curveBasis##whichCurveBasis",
             &whichCurveBasis,
             curveBasisUI_callback,

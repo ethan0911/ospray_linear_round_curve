@@ -25,6 +25,7 @@ struct OSPRAY_SDK_INTERFACE Curves : public Geometry
   Ref<const DataT<vec4f>> colorData;
   Ref<const DataT<vec2f>> texcoordData;
 
+
   float radius{0.01};
 
   RTCGeometryType embreeCurveType;

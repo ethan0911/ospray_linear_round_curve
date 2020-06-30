@@ -15,7 +15,9 @@
 namespace ospray {
 
 static std::map<std::pair<OSPCurveType, OSPCurveBasis>, RTCGeometryType>
-    curveMap = {{{OSP_ROUND, OSP_LINEAR}, RTC_GEOMETRY_TYPE_USER},
+    curveMap = {
+        // {{OSP_ROUND, OSP_LINEAR}, RTC_GEOMETRY_TYPE_USER},
+        {{OSP_ROUND, OSP_LINEAR}, RTC_GEOMETRY_TYPE_ROUND_LINEAR_CURVE},
         {{OSP_FLAT, OSP_LINEAR}, RTC_GEOMETRY_TYPE_FLAT_LINEAR_CURVE},
         {{OSP_RIBBON, OSP_LINEAR}, (RTCGeometryType)-1},
 
@@ -52,6 +54,7 @@ std::string Curves::toString() const
   return "ospray::Curves";
 }
 
+Ref<const DataT<char>> flagsLinear;
 void Curves::commit()
 {
   indexData = getParamDataT<uint32_t>("index", true);
@@ -59,6 +62,7 @@ void Curves::commit()
   tangentData = nullptr;
   vertexData = getParamDataT<vec3f>("vertex.position");
   texcoordData = getParamDataT<vec2f>("vertex.texcoord");
+  flagsLinear = getParamDataT<char>("flags.linear");
 
   if (vertexData) { // round, linear curves with constant radius
     radius = getParam<float>("radius", 0.01f);
@@ -82,11 +86,11 @@ void Curves::commit()
     if (curveBasis == OSP_UNKNOWN_CURVE_BASIS)
       throw std::runtime_error("curves geometry has invalid 'basis'");
 
-    if (curveBasis == OSP_LINEAR && curveType != OSP_FLAT) {
-      throw std::runtime_error(
-          "curves geometry with linear basis must be of flat type or have "
-          "constant radius");
-    }
+    // if (curveBasis == OSP_LINEAR && curveType != OSP_FLAT) {
+    //   throw std::runtime_error(
+    //       "curves geometry with linear basis must be of flat type or have "
+    //       "constant radius");
+    // }
 
     if (curveType == OSP_RIBBON)
       normalData = getParamDataT<vec3f>("vertex.normal", true);
@@ -140,6 +144,17 @@ void Curves::createEmbreeGeometry()
       rtcSetGeometryVertexAttributeCount(embreeGeometry, 2);
       setEmbreeGeometryBuffer(
           embreeGeometry, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, texcoordData, 1);
+    }
+
+    if (embreeCurveType == RTC_GEOMETRY_TYPE_ROUND_LINEAR_CURVE) {
+      rtcSetSharedGeometryBuffer(embreeGeometry,
+          RTC_BUFFER_TYPE_FLAGS,
+          0,
+          RTC_FORMAT_UCHAR,
+          flagsLinear->data(),
+          0,
+          sizeof(char),
+          indexData->size());
     }
 
     ispc::Curves_set(
